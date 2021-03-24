@@ -2,6 +2,7 @@ package mw.metrics;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.annotation.Timed;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -22,12 +23,14 @@ public class MovieService {
         metricRegistry.register("CACHE_SIZE", (Gauge<Integer>) () -> cache.size());
     }
 
-    @Scheduled(fixedDelay = 1000)
+    @Scheduled(fixedDelay = 3000)
     public void scheduleFixedDelayTask() {
         System.out.println("Fixed delay task - " + System.currentTimeMillis() / 1000);
         getFor("");
+        score("");
     }
 
+    @Timed(name="getForName",absolute = true)
     public String getFor(String name) {
 
        // try {
@@ -41,6 +44,7 @@ public class MovieService {
         return "Test";
     }
 
+    @Timed(name="score",absolute = true)
     public String score(String name) {
         try {
             Thread.sleep(3000);
