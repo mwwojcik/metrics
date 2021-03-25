@@ -3,6 +3,8 @@ package mw.metrics;
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.graphite.Graphite;
 import com.codahale.metrics.graphite.GraphiteReporter;
+import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
+import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
@@ -35,8 +37,15 @@ public class MetricsConfiguration {
             var reporter = GraphiteReporter.forRegistry(metricRegistry)
                                            .prefixedWith(String.format("services.movie %s", host))
                                            .build(graphite);
-            reporter.start(3, TimeUnit.SECONDS);
+            reporter.start(30, TimeUnit.SECONDS);
         }
+
+        @PostConstruct
+        public void registerJVMMetrics() {
+            metricRegistry.registerAll("gc",new GarbageCollectorMetricSet());
+            metricRegistry.registerAll("memory",new MemoryUsageGaugeSet());
+        }
+
 
     }
 }

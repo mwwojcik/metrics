@@ -23,7 +23,7 @@ public class MovieService {
         metricRegistry.register("CACHE_SIZE", (Gauge<Integer>) () -> cache.size());
     }
 
-    @Scheduled(fixedDelay = 3000)
+    @Scheduled(fixedDelay = 1000)
     public void scheduleFixedDelayTask() {
         System.out.println("Fixed delay task - " + System.currentTimeMillis() / 1000);
         getFor("");

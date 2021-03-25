@@ -1,0 +1,5 @@
+mw/metrics/MovieController.class
+mw/metrics/MetricsConfiguration.class
+mw/metrics/MovieService.class
+mw/metrics/MetricsApplication.class
+mw/metrics/MetricsConfiguration$MetricsGraphiteConfiguration.class
