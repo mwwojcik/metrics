@@ -10,6 +10,7 @@ import java.net.UnknownHostException;
 import java.util.concurrent.TimeUnit;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.web.ServerProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -48,4 +49,6 @@ public class MetricsConfiguration {
 
 
     }
+
+    @Autowired private ServerProperties serverProperties;
 }

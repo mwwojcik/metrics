@@ -1,6 +1,7 @@
 package mw.metrics;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,7 +16,7 @@ public class MovieController {
     @Autowired
     MovieService service;
 
-    @GetMapping
+    //@GetMapping
     public ResponseEntity getScoringFor(@RequestParam(name = "name") String name) {
         service.getFor(name);
         return ResponseEntity.ok().build();
@@ -27,6 +28,14 @@ public class MovieController {
         service.score(name);
 
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping
+    public ResponseEntity<String> getMovies(){
+        if(1==1){
+            throw new IllegalArgumentException();
+        }
+        return ResponseEntity.ok("ok");
     }
 
 

@@ -2,6 +2,8 @@ package mw.metrics.sandbox;
 
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
+import com.codahale.metrics.annotation.Timed;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -86,7 +88,16 @@ public class HashMapTest {
             chunkedMap.put(new HashedKey(i), i);
             Instant chunkedStop = Instant.now();
             chunkedLastInsertTime=Duration.between(chunkedStart, chunkedStop).toNanos();
+
+            performSomeHeapOperations();
         }
+
+    }
+
+    private void performSomeHeapOperations() {
+        BigDecimal init = BigDecimal.TEN;
+        var multiply = init.multiply(BigDecimal.valueOf(2));
+        var divide = multiply.divide(BigDecimal.valueOf(2));
 
     }
 
