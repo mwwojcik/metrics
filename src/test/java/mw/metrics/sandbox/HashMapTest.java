@@ -1,45 +1,29 @@
 package mw.metrics.sandbox;
 
-import com.codahale.metrics.Gauge;
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.annotation.Timed;
-import java.math.BigDecimal;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Random;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
-
-@SpringBootTest(classes = {MetricsTestsConfiguration.class})
-@Import(MetricsTestsConfiguration.class)
+/*@SpringBootTest(classes = {MetricsTestsConfiguration.class})
+@Import(MetricsTestsConfiguration.class)*/
 public class HashMapTest {
+
+}/*{
 
     @Autowired
     private MetricRegistry metricRegistry;
     public static final int MAX_ELEM = 1_000_000;
     private Map<Key, Integer> notChunkedMap = new HashMap<>();
     private Map<HashedKey, Integer> chunkedMap = new HashMap<>();
-
-    private Long notChunkedLastInsertTime=Long.valueOf(0);
-    private Long chunkedLastInsertTime=Long.valueOf(0);
+    private Long notChunkedLastInsertTime = Long.valueOf(0);
+    private Long chunkedLastInsertTime = Long.valueOf(0);
 
     @BeforeEach
     private void init() {
 
-        metricRegistry.register("NOT_CHUNKED_MAP_SIZE", (Gauge<Integer>) () -> notChunkedMap.size());
+       *//* metricRegistry.register("NOT_CHUNKED_MAP_SIZE", (Gauge<Integer>) () -> notChunkedMap.size());
         metricRegistry.register("NOT_CHUNKED_GET_TIME", (Gauge<Long>) () -> notChunkedGetTiming());
         metricRegistry.register("NOT_CHUNKED_INSERT_TIME", (Gauge<Long>) () -> notChunkedInsertTiming());
 
         metricRegistry.register("CHUNKED_MAP_SIZE", (Gauge<Integer>) () -> chunkedMap.size());
         metricRegistry.register("CHUNKED_GET_TIME", (Gauge<Long>) () -> chunkedGetTiming());
-        metricRegistry.register("CHUNKED_INSERT_TIME", (Gauge<Long>) () -> chunkedInsertTiming());
+        metricRegistry.register("CHUNKED_INSERT_TIME", (Gauge<Long>) () -> chunkedInsertTiming());*//*
 
     }
 
@@ -74,20 +58,19 @@ public class HashMapTest {
 
     }
 
-    @DisplayName("should observe hashmap behaviour")
-    @Test
+    *//* @DisplayName("should observe hashmap behaviour")
+     @Test*//*
     void shouldObserveHashmapBehaviour() {
         for (int i = 0; i < MAX_ELEM; i++) {
             Instant notChunkedStart = Instant.now();
             notChunkedMap.put(new Key(i), i);
             Instant notChunkedStop = Instant.now();
-            notChunkedLastInsertTime=Duration.between(notChunkedStart, notChunkedStop).toNanos();
-
+            notChunkedLastInsertTime = Duration.between(notChunkedStart, notChunkedStop).toNanos();
 
             Instant chunkedStart = Instant.now();
             chunkedMap.put(new HashedKey(i), i);
             Instant chunkedStop = Instant.now();
-            chunkedLastInsertTime=Duration.between(chunkedStart, chunkedStop).toNanos();
+            chunkedLastInsertTime = Duration.between(chunkedStart, chunkedStop).toNanos();
 
             performSomeHeapOperations();
         }
@@ -153,4 +136,4 @@ public class HashMapTest {
         }
     }
 
-}
+}*/

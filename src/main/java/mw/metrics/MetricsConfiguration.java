@@ -1,13 +1,6 @@
 package mw.metrics;
 
-import com.codahale.metrics.MetricRegistry;
-import com.codahale.metrics.graphite.Graphite;
-import com.codahale.metrics.graphite.GraphiteReporter;
-import com.codahale.metrics.jvm.GarbageCollectorMetricSet;
-import com.codahale.metrics.jvm.MemoryUsageGaugeSet;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.concurrent.TimeUnit;
+import io.micrometer.core.instrument.MeterRegistry;
 import javax.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.web.ServerProperties;
@@ -19,18 +12,15 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class MetricsConfiguration {
 
-    @Bean
-    public MetricRegistry metricRegistry() {
-        return new MetricRegistry();
-    }
+
 
     @Configuration
     public static class MetricsGraphiteConfiguration {
 
         @Autowired
-        MetricRegistry metricRegistry;
+        private ServerProperties serverProperties;
 
-        @PostConstruct
+       /* @PostConstruct
         public void startGraphiteReporter()
             throws UnknownHostException {
             var host = InetAddress.getLocalHost().getHostAddress();
@@ -39,16 +29,15 @@ public class MetricsConfiguration {
                                            .prefixedWith(String.format("services.movie %s", host))
                                            .build(graphite);
             reporter.start(30, TimeUnit.SECONDS);
-        }
+        }*/
 
         @PostConstruct
-        public void registerJVMMetrics() {
-            metricRegistry.registerAll("gc",new GarbageCollectorMetricSet());
-            metricRegistry.registerAll("memory",new MemoryUsageGaugeSet());
+        public void registerJVMMetrics(MeterRegistry meterRegistry) {
+
+            /*metricRegistry.registerAll("memory",new MemoryUsageGaugeSet());
+            metricRegistry.registerAll("gc",new GarbageCollectorMetricSet());*/
         }
 
 
     }
-
-    @Autowired private ServerProperties serverProperties;
 }
