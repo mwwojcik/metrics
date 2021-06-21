@@ -17,7 +17,6 @@ public class SlowRespondingTeamDetailService {
                                                       TeamDetailsDTO.from(TeamCode.PL, "Spain", 4));
 
     public TeamDetailsDTO get(TeamCode key) {
-        Sleeper.sleepSecconds(5);
         return db.get(key);
     }
 }

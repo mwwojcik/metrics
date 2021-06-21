@@ -1,10 +1,12 @@
 package mw.metrics.teams.model;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class TeamScoreDTO {
 
     private TeamCode code;
