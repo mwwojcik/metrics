@@ -1,6 +1,11 @@
 package mw.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import java.util.ArrayList;
+import java.util.List;
+import javax.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.FastRespondingTeamPlayersService;
 import mw.metrics.teams.SlowRespondingTeamDetailService;
 import mw.metrics.teams.TeamDetailsController;
@@ -16,7 +21,16 @@ import reactor.netty.http.client.HttpClient;
 
 @Configuration
 @EnableScheduling
+@Slf4j
 public class MetricsConfiguration {
+
+    @PostConstruct
+    public void init(){
+        for (int i = 0; i < 10000; i++) {
+            (new MyThread()).start();
+            log.info("Thread created=>"+i);
+        }
+    }
 
     @Bean
     MeterRegistryCustomizer<MeterRegistry> metricsCommonTags() {
@@ -44,4 +58,29 @@ public class MetricsConfiguration {
         return new FastRespondingTeamPlayersService();
     }
 
+}
+
+class MyThread extends Thread{
+    List<MyObject> list = new ArrayList<>();
+
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(500*1000);
+        } catch (InterruptedException e) {
+            throw new IllegalArgumentException(e);
+        }
+        System.out.println("Thread activated=>"+Thread.currentThread().getName());
+        for (int i = 0; i < 500; i++) {
+            list.add(new MyObject(Thread.currentThread().getName(),i));
+            System.out.println("New Object added! Thread=>"+Thread.currentThread().getName());
+        }
+
+    }
+}
+
+@AllArgsConstructor
+class MyObject{
+    String name;
+    Integer account;
 }
