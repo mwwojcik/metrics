@@ -1,6 +1,7 @@
 package mw.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -39,7 +40,8 @@ public class MetricsConfiguration {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().compress(true))).build();
+        return WebClient.builder().clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().responseTimeout(
+            Duration.ofSeconds(1)).compress(true))).build();
     }
 
     @Bean
