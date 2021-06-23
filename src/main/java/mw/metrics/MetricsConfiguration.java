@@ -24,9 +24,9 @@ import reactor.netty.http.client.HttpClient;
 @Slf4j
 public class MetricsConfiguration {
 
-    @PostConstruct
+    //@PostConstruct
     public void init(){
-        for (int i = 0; i < 10000; i++) {
+        for (int i = 0; i < 1000; i++) {
             (new MyThread()).start();
             log.info("Thread created=>"+i);
         }

@@ -1,5 +1,6 @@
 package mw.metrics.teams;
 
+import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamScoreDTO;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/team")
+@Slf4j
 public class TeamController {
 
     private TeamService service;
@@ -22,6 +24,7 @@ public class TeamController {
     @GetMapping("/{code}/score")
     public ResponseEntity<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode) {
         var res = service.score(TeamCode.valueOf(teamCode));
+        log.info("GET on /team/score received!");
         return ResponseEntity.ok(res);
     }
 
@@ -29,6 +32,7 @@ public class TeamController {
     @GetMapping("/{code}/captain")
     public ResponseEntity<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode) {
         var res = service.captain(TeamCode.valueOf(teamCode));
+        log.info("GET on /team/captain received!");
         return ResponseEntity.ok(res);
     }
 }
