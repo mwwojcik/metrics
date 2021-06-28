@@ -4,10 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamScoreDTO;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -22,17 +24,19 @@ public class TeamController {
     }
 
     @GetMapping("/{code}/score")
-    public ResponseEntity<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode) {
+    @ResponseStatus(HttpStatus.OK)
+    public TeamScoreDTO score(@PathVariable(name = "code") String teamCode) {
         var res = service.score(TeamCode.valueOf(teamCode));
         log.info("GET on /team/score received!");
-        return ResponseEntity.ok(res);
+        return res;
     }
 
 
     @GetMapping("/{code}/captain")
-    public ResponseEntity<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode) {
+    @ResponseStatus(HttpStatus.OK)
+    public TeamCaptainDTO captain(@PathVariable(name = "code") String teamCode) {
         var res = service.captain(TeamCode.valueOf(teamCode));
         log.info("GET on /team/captain received!");
-        return ResponseEntity.ok(res);
+        return res;
     }
 }

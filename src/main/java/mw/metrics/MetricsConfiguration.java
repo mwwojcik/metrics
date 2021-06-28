@@ -40,8 +40,9 @@ public class MetricsConfiguration {
 
     @Bean
     public WebClient webClient() {
-        return WebClient.builder().clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().responseTimeout(
-            Duration.ofSeconds(1)).compress(true))).build();
+        /*return WebClient.builder().clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().responseTimeout(
+            Duration.ofSeconds(1)).compress(true))).build();*/
+        return WebClient.builder().clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().compress(true))).build();
     }
 
     @Bean
