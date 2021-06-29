@@ -25,18 +25,19 @@ public class TeamController {
 
     @GetMapping("/{code}/score")
     @ResponseStatus(HttpStatus.OK)
-    public TeamScoreDTO score(@PathVariable(name = "code") String teamCode) {
+    public ResponseEntity<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode) {
         var res = service.score(TeamCode.valueOf(teamCode));
         log.info("GET on /team/score received!");
-        return res;
+        return ResponseEntity.ok(res);
     }
 
 
     @GetMapping("/{code}/captain")
     @ResponseStatus(HttpStatus.OK)
-    public TeamCaptainDTO captain(@PathVariable(name = "code") String teamCode) {
+    public ResponseEntity<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode) {
         var res = service.captain(TeamCode.valueOf(teamCode));
         log.info("GET on /team/captain received!");
-        return res;
+        return ResponseEntity.ok(res);
+
     }
 }
