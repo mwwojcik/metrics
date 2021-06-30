@@ -27,7 +27,7 @@ public class MetricsConfiguration {
 
     @PostConstruct
     public void init(){
-        for (int i = 0; i < 2000; i++) {
+        for (int i = 0; i < 6000; i++) {
             (new MyThread()).start();
             log.info("Thread created=>"+i);
         }
