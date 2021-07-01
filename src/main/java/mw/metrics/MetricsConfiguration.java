@@ -1,7 +1,6 @@
 package mw.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
-import java.time.Duration;
 import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.PostConstruct;
@@ -9,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.FastRespondingTeamPlayersService;
 import mw.metrics.teams.SlowRespondingTeamDetailService;
-import mw.metrics.teams.TeamDetailsController;
-import mw.metrics.teams.TeamPlayersController;
 import mw.metrics.teams.TeamService;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +15,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.netty.http.client.HttpClient;
 
 @Configuration
 @EnableScheduling
@@ -64,7 +60,7 @@ public class MetricsConfiguration {
 }
 
 class MyThread extends Thread{
-    List<MyObject> list = new ArrayList<>();
+    List<MyObject> list = new ArrayList<>(200);
 
     @Override
     public void run() {
@@ -73,12 +69,15 @@ class MyThread extends Thread{
         } catch (InterruptedException e) {
             throw new IllegalArgumentException(e);
         }
-        System.out.println("Thread activated=>"+Thread.currentThread().getName());
+
+
+    }
+
+    private void mwstart() {
         for (int i = 0; i < 500; i++) {
             list.add(new MyObject(Thread.currentThread().getName(),i));
             System.out.println("New Object added! Thread=>"+Thread.currentThread().getName());
         }
-
     }
 }
 
