@@ -70,6 +70,52 @@ Rel(team,team_details,"(details) -  WebClient communication, slow responding res
 @enduml
 ....
 
+Additionally, the application creates 6000 sleeping threads at startup. 5 minutes after it starts, threads activate and fill their object arrays while monitoring is in progress. This places additional strain and resource utilization.
+....
+
+ @PostConstruct
+    public void init(){
+        for (int i = 0; i < 6000; i++) {
+            (new MyThread()).start();
+            log.info("Thread created=>"+i);
+        }
+    }
+
+....
+
+[java]
+....
+class MyThread extends Thread{
+    List<MyObject> list = new ArrayList<>(200);
+
+    @Override
+    public void run() {
+        try {
+            Thread.sleep(500*1000);
+        } catch (InterruptedException e) {
+            throw new IllegalArgumentException(e);
+        }
+
+
+    }
+
+    private void mwstart() {
+        for (int i = 0; i < 600; i++) {
+            list.add(new MyObject(Thread.currentThread().getName(),i));
+            System.out.println("New Object added! Thread=>"+Thread.currentThread().getName());
+        }
+    }
+}
+
+@AllArgsConstructor
+class MyObject{
+    String name;
+    Integer account;
+}
+
+
+....
+
 == Environment configuration
 
 
