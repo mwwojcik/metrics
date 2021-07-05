@@ -74,7 +74,7 @@ class MyThread extends Thread{
     }
 
     private void mwstart() {
-        for (int i = 0; i < 500; i++) {
+        for (int i = 0; i < 600; i++) {
             list.add(new MyObject(Thread.currentThread().getName(),i));
             System.out.println("New Object added! Thread=>"+Thread.currentThread().getName());
         }

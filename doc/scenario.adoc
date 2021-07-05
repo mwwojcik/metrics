@@ -1,0 +1,105 @@
+
+= Test construction
+
+The test is structured as follows. The client communicates with the controller and can perform two actions "captain" and "score". Each of them communicates with a different controller (via WebClient). After the "captain" action, TeamController communicates with TeamPlayersController,
+and after the "score" action, TeamController communicates with TemDetailsController.
+
+One of these resources is slow responding.
+
+== Test common structure
+
+[plantuml]
+....
+@startuml
+!include header.puml
+
+Person(user, User, "          User          ")
+
+Container_Boundary(api, "API Application") {
+   Component(team, "Football Teams Controller", "MVC Rest Controlle", "Allows users to get basic info about teams")
+   Component(team_details, "Football Teams Detailed Info Controller", "MVC Rest Controlle", "Allows users to get detailed info about teams")
+   Component(team_players, "Football Teams Player Info Controller", "MVC Rest Controlle", "Allows users to get basic info about teams players")
+}
+Rel(user,team,"captain")
+Rel(team,team_details,"(details) -  WebClient communication, slow responding resource")
+Rel(team,team_players,"(players) - WebClient communication")
+@enduml
+....
+
+== Test "captain" path communication
+-
+[plantuml]
+....
+@startuml
+!include header.puml
+
+Person(user, User, "          User          ")
+
+Container_Boundary(api, "API Application") {
+   Component(team, "Football Teams Controller", "MVC Rest Controlle", "Allows users to get basic info about teams")
+   Component(team_players, "Football Teams Player Info Controller", "MVC Rest Controlle", "Allows users to get basic info about teams players")
+}
+
+Rel(user,team,"captain")
+
+
+Rel(team,team_players,"(players) - WebClient communication")
+@enduml
+....
+
+== Test "score" path communication
+
+[plantuml]
+....
+@startuml
+!include header.puml
+
+
+Person(user, User, "          User          ")
+
+Container_Boundary(api, "API Application") {
+   Component(team, "Football Teams Controller", "MVC Rest Controlle", "Allows users to get basic info about teams")
+   Component(team_details, "Football Teams Detailed Info Controller", "MVC Rest Controlle", "Allows users to get detailed info about teams")
+
+}
+
+Rel(user,team,"score")
+
+
+Rel(team,team_details,"(details) -  WebClient communication, slow responding resource")
+@enduml
+....
+
+== Environment configuration
+
+
+|===
+| Property | Value
+
+|Environment|Spring`boot
+
+|Web server
+|Tomcat
+
+|Maximum amount of worker threads (server.tomcat.threads.max)
+|200
+
+|Maximum queue length for incoming connection requests when all possible request processing threads are in use. (server.tomcat.accept-count)
+|100
+|===
+
+_https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#application-properties.web_
+
+
+|===
+|Tool | Role
+
+|h2load,ab,hey,wrk
+|Benchmark tools
+
+|Micrometer,Prometheus,Grafana
+|Monitoring
+
+|http://gclogs.com/
+|GC logs analyser
+|===
