@@ -70,6 +70,45 @@ Rel(team,team_details,"(details) -  WebClient communication, slow responding res
 @enduml
 ....
 
+
+
+== Environment configuration
+
+
+|===
+| Property | Value
+
+|Environment|Spring`boot
+
+|Web server
+|Tomcat
+
+|Maximum amount of worker threads (server.tomcat.threads.max)
+|200
+
+|Maximum queue length for incoming connection requests when all possible request processing threads are in use. (server.tomcat.accept-count)
+|100
+|===
+
+_https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#application-properties.web_
+
+
+|===
+|Tool | Role
+
+|h2load,ab,hey,wrk
+|Benchmark tools
+
+|Micrometer,Prometheus,Grafana
+|Monitoring
+
+|http://gclogs.com/
+|GC logs analyser
+|===
+
+
+=Appendix - additional tests - TODO
+
 Additionally, the application creates 6000 sleeping threads at startup. 5 minutes after it starts, threads activate and fill their object arrays while monitoring is in progress. This places additional strain and resource utilization.
 ....
 
@@ -115,37 +154,3 @@ class MyObject{
 
 
 ....
-
-== Environment configuration
-
-
-|===
-| Property | Value
-
-|Environment|Spring`boot
-
-|Web server
-|Tomcat
-
-|Maximum amount of worker threads (server.tomcat.threads.max)
-|200
-
-|Maximum queue length for incoming connection requests when all possible request processing threads are in use. (server.tomcat.accept-count)
-|100
-|===
-
-_https://docs.spring.io/spring-boot/docs/current/reference/html/application-properties.html#application-properties.web_
-
-
-|===
-|Tool | Role
-
-|h2load,ab,hey,wrk
-|Benchmark tools
-
-|Micrometer,Prometheus,Grafana
-|Monitoring
-
-|http://gclogs.com/
-|GC logs analyser
-|===

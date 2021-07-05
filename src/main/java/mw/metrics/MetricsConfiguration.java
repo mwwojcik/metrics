@@ -21,11 +21,11 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class MetricsConfiguration {
 
-    @PostConstruct
-    public void init(){
+   // @PostConstruct
+    public void init() {
         for (int i = 0; i < 6000; i++) {
             (new MyThread()).start();
-            log.info("Thread created=>"+i);
+            log.info("Thread created=>" + i);
         }
     }
 
@@ -46,7 +46,6 @@ public class MetricsConfiguration {
         return new TeamService(webClient);
     }
 
-
     @Bean
     public SlowRespondingTeamDetailService slowRespondingTeamDetailService() {
         return new SlowRespondingTeamDetailService();
@@ -59,30 +58,34 @@ public class MetricsConfiguration {
 
 }
 
-class MyThread extends Thread{
-    List<MyObject> list = new ArrayList<>(200);
+class MyThread extends Thread {
+
+    List<MyObject> list = new ArrayList<>(600);
 
     @Override
     public void run() {
-        try {
-            Thread.sleep(500*1000);
-        } catch (InterruptedException e) {
-            throw new IllegalArgumentException(e);
-        }
-
-
+        Sleeper.sleepSecconds(120);
+        mwstart();
     }
 
     private void mwstart() {
         for (int i = 0; i < 600; i++) {
-            list.add(new MyObject(Thread.currentThread().getName(),i));
-            System.out.println("New Object added! Thread=>"+Thread.currentThread().getName());
+            var item = new MyObject(Thread.currentThread().getName(), i);
+            list.add(item);
+            NotSoGoodStorage.db.add(item);
+            System.out.println("New Object added! Thread=>" + Thread.currentThread().getName());
         }
     }
 }
 
 @AllArgsConstructor
-class MyObject{
+class MyObject {
+
     String name;
     Integer account;
 }
+
+class NotSoGoodStorage{
+    public static List<Object> db=new ArrayList<>();
+}
+
