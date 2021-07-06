@@ -108,6 +108,42 @@ _https://docs.spring.io/spring-boot/docs/current/reference/html/application-prop
 
 == Test - scenario 1
 
+Traffic with the following parameters was generated:
+
+....
+hey -z 10m -c 100 http://localhost:8080/team/PL/score
+....
+
+....
+hey -z 10m -c 100 http://localhost:8080/team/PL/captain
+....
+
+=== Results
+image::tests/scenario-1/hey-score.png[]
+
+image::tests/scenario-1/hey-captain.png[]
+
+image::tests/scenario-1/tomcat.png[]
+
+image::tests/scenario-1/jvm-memory.png[]
+
+image::tests/scenario-1/jvm-heap.png[]
+
+image::tests/scenario-1/gc.png[]
+
+== Test - scenario 2 - memory leak (static collection)
+
+image::tests/test-scenario-2/hey-score.png[]
+
+image::tests/test-scenario-2/hey-captain.png[]
+
+image::tests/test-scenario-2/tomcat.png[]
+
+image::tests/test-scenario-2/jvm-memory.png[]
+
+image::tests/test-scenario-2/jvm-heap.png[]
+
+image::tests/test-scenario-2/gc.png[]
 
 
 == Appendix - additional tests - TODO
