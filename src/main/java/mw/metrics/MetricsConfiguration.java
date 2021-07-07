@@ -21,9 +21,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @Slf4j
 public class MetricsConfiguration {
 
-   // @PostConstruct
+   @PostConstruct
     public void init() {
-        for (int i = 0; i < 6000; i++) {
+        for (int i = 0; i < 1000; i++) {
             (new MyThread()).start();
             log.info("Thread created=>" + i);
         }
@@ -60,18 +60,20 @@ public class MetricsConfiguration {
 
 class MyThread extends Thread {
 
-    List<MyObject> list = new ArrayList<>(600);
+   // List<MyObject> list = new ArrayList<>(600);
 
     @Override
     public void run() {
         Sleeper.sleepSecconds(120);
         mwstart();
+        Sleeper.sleepSecconds(120);
+        mwstart();
     }
 
     private void mwstart() {
-        for (int i = 0; i < 600; i++) {
+        for (int i = 0; i < 1000; i++) {
             var item = new MyObject(Thread.currentThread().getName(), i);
-            list.add(item);
+            TeamService.db.add(item);
             NotSoGoodStorage.db.add(item);
             System.out.println("New Object added! Thread=>" + Thread.currentThread().getName());
         }

@@ -27,7 +27,7 @@ public class TeamService {
     private long maxFileDesc;
     private Random rand=new Random();
 
-    private static List<Object> db=new ArrayList<>();
+    public static List<Object> db=new ArrayList<>(100000);
 
     public TeamService(WebClient webClient) {
         b= (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
@@ -37,6 +37,7 @@ public class TeamService {
     public TeamScoreDTO score(TeamCode teamCode) {
         var uri = UriComponentsBuilder.fromUriString(detailsQueryString).build(teamCode.name());
         db.add(new MyObject("Score", rand.nextInt()));
+        db.add(rand.nextInt());
         var result = webClient.get().uri(uri).retrieve().bodyToMono(TeamDetailsDTO.class).block();
         log.info(String.format("Open files %s, Max files %s", b.getOpenFileDescriptorCount(),b.getMaxFileDescriptorCount()));
 
@@ -49,6 +50,7 @@ public class TeamService {
         var result = webClient.get().uri(uri).retrieve().bodyToMono(TeamPlayersDTO.class).block();
         log.info(String.format("Open files %s, Max files %s", b.getOpenFileDescriptorCount(),b.getMaxFileDescriptorCount()));
         db.add(new MyObject("Captain", rand.nextInt()));
+        db.add(rand.nextInt());
         return TeamCaptainDTO.from(teamCode, result.getCaptain());
     }
 
