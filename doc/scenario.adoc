@@ -108,6 +108,8 @@ _https://docs.spring.io/spring-boot/docs/current/reference/html/application-prop
 
 == Test - scenario 1
 
+=== Test configuration
+
 Traffic with the following parameters was generated:
 
 ....
@@ -132,6 +134,88 @@ image::tests/scenario-1/jvm-heap.png[]
 image::tests/scenario-1/gc.png[]
 
 == Test - scenario 2 - memory leak (static collection)
+
+=== Test configuration
+
+There have been some changes to the test setup.
+
+First of all, the Heap area has been decreased to 400 MB:
+
+....
+java -Xmx400M -Xms400M -jar build/libs/metrics-0.0.1-SNAPSHOT.jar
+....
+
+Secondly, a memory leak was simulated.
+
+There is a static list of objects in the service class that is populated with each request.
+
+....
+public class TeamService {
+
+    public static List<Object> db=new ArrayList<>(100000);
+
+    public TeamScoreDTO score(TeamCode teamCode) {
+        db.add(new MyObject("Score", rand.nextInt()));
+        db.add(rand.nextInt());
+        return TeamScoreDTO.from(teamCode,result.getPosition());
+    }
+
+    public TeamCaptainDTO captain(TeamCode teamCode) {
+        db.add(new MyObject("Captain", rand.nextInt()));
+        db.add(rand.nextInt());
+        return TeamCaptainDTO.from(teamCode, result.getCaptain());
+    }
+....
+
+Third, an additional load on the application has been generated. For this purpose, 1000 threads were created, which after 2 minutes of sleep, arise and fill the static list with additional objects
+
+....
+
+public class MetricsConfiguration {
+
+   @PostConstruct
+    public void init() {
+        for (int i = 0; i < 1000; i++) {
+            (new MyThread()).start();
+            log.info("Thread created=>" + i);
+        }
+    }
+
+
+}
+
+class MyThread extends Thread {
+
+   // List<MyObject> list = new ArrayList<>(600);
+
+    @Override
+    public void run() {
+        Sleeper.sleepSecconds(120);
+        mwstart();
+        Sleeper.sleepSecconds(120);
+        mwstart();
+    }
+
+    private void mwstart() {
+        for (int i = 0; i < 1000; i++) {
+            var item = new MyObject(Thread.currentThread().getName(), i);
+            TeamService.db.add(item);
+        }
+    }
+}
+....
+
+Traffic with the following parameters was generated:
+
+....
+hey -z 10m -c 100 http://localhost:8080/team/PL/score
+....
+
+....
+hey -z 10m -c 100 http://localhost:8080/team/PL/captain
+....
+
+=== Results
 
 image::tests/test-scenario-2/hey-score.png[]
 
