@@ -3,6 +3,8 @@ package mw.metrics;
 import io.micrometer.core.instrument.MeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ThreadPoolExecutor;
 import javax.annotation.PostConstruct;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -10,23 +12,33 @@ import mw.metrics.teams.FastRespondingTeamPlayersService;
 import mw.metrics.teams.SlowRespondingTeamDetailService;
 import mw.metrics.teams.TeamService;
 import org.springframework.boot.actuate.autoconfigure.metrics.MeterRegistryCustomizer;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.client.reactive.ReactorClientHttpConnector;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Configuration
 @EnableScheduling
 @Slf4j
+@EnableAsync
 public class MetricsConfiguration {
 
-   @PostConstruct
+    @PostConstruct
     public void init() {
         for (int i = 0; i < 1000; i++) {
             (new MyThread()).start();
             log.info("Thread created=>" + i);
         }
+    }
+
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplateBuilder().build();
     }
 
     @Bean
@@ -41,9 +53,45 @@ public class MetricsConfiguration {
         return WebClient.builder().clientConnector(new ReactorClientHttpConnector()).build();
     }
 
+    @Bean("DetailsExecutor")
+    public Executor detailsExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(100);
+        executor.setKeepAliveSeconds(10);
+        executor.setThreadNamePrefix("detailsExecutor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        return executor;
+    }
+
+    @Bean("PlayersExecutor")
+    public Executor playersExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(100);
+        executor.setKeepAliveSeconds(10);
+        executor.setThreadNamePrefix("playersExecutor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        return executor;
+    }
+
+    @Bean("PresidentsExecutor")
+    public Executor presidentsExecutor() {
+        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
+        executor.setCorePoolSize(10);
+        executor.setMaxPoolSize(20);
+        executor.setQueueCapacity(100);
+        executor.setKeepAliveSeconds(10);
+        executor.setThreadNamePrefix("presidentsExecutor-");
+        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
+        return executor;
+    }
+
     @Bean
-    public TeamService teamService(WebClient webClient) {
-        return new TeamService(webClient);
+    public TeamService teamService(WebClient webClient, RestTemplate restTemplate) {
+        return new TeamService(webClient, restTemplate);
     }
 
     @Bean
@@ -60,7 +108,7 @@ public class MetricsConfiguration {
 
 class MyThread extends Thread {
 
-   // List<MyObject> list = new ArrayList<>(600);
+    // List<MyObject> list = new ArrayList<>(600);
 
     @Override
     public void run() {
@@ -87,7 +135,8 @@ class MyObject {
     Integer account;
 }
 
-class NotSoGoodStorage{
-    public static List<Object> db=new ArrayList<>();
+class NotSoGoodStorage {
+
+    public static List<Object> db = new ArrayList<>();
 }
 

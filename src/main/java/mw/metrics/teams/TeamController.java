@@ -1,8 +1,12 @@
 package mw.metrics.teams;
 
+import io.netty.util.concurrent.CompleteFuture;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
+import mw.metrics.teams.model.TeamPresidentDTO;
 import mw.metrics.teams.model.TeamScoreDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,19 +29,31 @@ public class TeamController {
 
     @GetMapping("/{code}/score")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode) {
+    public CompletableFuture<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode)
+        throws InterruptedException, ExecutionException {
         var res = service.score(TeamCode.valueOf(teamCode));
         log.info("GET on /team/score received!");
-        return ResponseEntity.ok(res);
+        var teamScoreDTO = res.get();
+        return res;
     }
 
 
     @GetMapping("/{code}/captain")
     @ResponseStatus(HttpStatus.OK)
-    public ResponseEntity<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode) {
+    public CompletableFuture<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode)
+        throws ExecutionException, InterruptedException {
         var res = service.captain(TeamCode.valueOf(teamCode));
         log.info("GET on /team/captain received!");
-        return ResponseEntity.ok(res);
+        var teamCaptainDTO = res.get();
+        return res;
 
+    }
+
+    @GetMapping("/{code}/president")
+    @ResponseStatus(HttpStatus.OK)
+    public TeamPresidentDTO president(@PathVariable(name = "code") String teamCode){
+        var res = service.president(TeamCode.valueOf(teamCode));
+        log.info("GET on /team/president received!");
+        return res;
     }
 }
