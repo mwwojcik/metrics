@@ -42,8 +42,8 @@ public class MetricsConfiguration {
     }
 
     @Bean
-    public TeamService teamService(WebClient webClient) {
-        return new TeamService(webClient);
+    public TeamService teamService(FastRespondingTeamPlayersService teamPlayersService, SlowRespondingTeamDetailService teamDetailService) {
+        return new TeamService(teamPlayersService,teamDetailService);
     }
 
     @Bean
