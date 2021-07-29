@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
@@ -24,55 +26,40 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class TeamService {
 
-    @Value("${user.service.host}")
-    String userServiceHost;
-    private WebClient webClient;
-    private String detailsQueryString = "http://localhost:8080/team/{code}/details";
-    private String playersQueryString = "http://localhost:8080/team/{code}/players";
-    private String presidentQueryString = "http://localhost:8080/team/{code}/teampresident?delay={delay}";
-    UnixOperatingSystemMXBean b;
-    private long openFileDesc;
-    private long maxFileDesc;
-    private Random rand = new Random();
+       private Random rand = new Random();
     public static List<Object> db = new ArrayList<>(100000);
-    private RestTemplate restTemplate;
+    private ExecutorService detailsServicePool = Executors.newFixedThreadPool(20);
+    private ExecutorService playersServicePool = Executors.newFixedThreadPool(20);
 
-    public TeamService(WebClient webClient, RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-        b = (UnixOperatingSystemMXBean) ManagementFactory.getOperatingSystemMXBean();
-        this.webClient = webClient;
+    private FastRespondingTeamPlayersService teamPlayersService;
+    private SlowRespondingTeamDetailService teamDetailService;
+
+    public TeamService(FastRespondingTeamPlayersService teamPlayersService,SlowRespondingTeamDetailService teamDetailService) {
+        this.teamPlayersService = teamPlayersService;
+        this.teamDetailService = teamDetailService;
     }
 
-    @Async("DetailsExecutor")
     public CompletableFuture<TeamScoreDTO> score(TeamCode teamCode) {
-        var uri = UriComponentsBuilder.fromUriString(detailsQueryString).build(teamCode.name());
-        makeHeapMesh("Score");
-        var result = webClient.get().uri(uri).retrieve().bodyToMono(TeamDetailsDTO.class).block();
-        log.info(String.format("Open files %s, Max files %s", b.getOpenFileDescriptorCount(), b.getMaxFileDescriptorCount()));
-
-        return CompletableFuture.completedFuture(TeamScoreDTO.from(teamCode, result.getPosition()));
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode), detailsServicePool);
+        return resultAsync.thenApply(it -> TeamScoreDTO.from(teamCode, it.getPosition()));
     }
 
-    @Async("PlayersExecutor")
     public CompletableFuture<TeamCaptainDTO> captain(TeamCode teamCode) {
-        var uri = UriComponentsBuilder.fromUriString(playersQueryString).build(teamCode.name());
-        //var result = webClient.get().uri(uri).retrieve().bodyToMono(TeamPlayersDTO.class).block();
-
-        var result = restTemplate.getForObject(uri, TeamPlayersDTO.class);
-
-        log.info(String.format("Open files %s, Max files %s", b.getOpenFileDescriptorCount(), b.getMaxFileDescriptorCount()));
-        makeHeapMesh("Captain");
-        return CompletableFuture.completedFuture(TeamCaptainDTO.from(teamCode, result.getCaptain()));
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamPlayer(teamCode), playersServicePool);
+        return resultAsync.thenApply(it -> TeamCaptainDTO.from(teamCode, it.getCaptain()));
     }
 
-    @Async("PresidentsExecutor")
-    public TeamPresidentDTO president(TeamCode teamCode) {
 
-        var uri = UriComponentsBuilder.fromUriString(presidentQueryString).build(teamCode.name(), "500");
 
-        var result = restTemplate.getForObject(uri, TeamPresidentDTO.class);
 
-        return result;
+    private TeamPlayersDTO loadTeamPlayer(TeamCode teamCode) {
+        makeHeapMesh("Captain");
+        return teamPlayersService.get(teamCode);
+    }
+
+    private TeamDetailsDTO loadTeamDetails(TeamCode teamCode) {
+        makeHeapMesh("Score");
+        return teamDetailService.get(teamCode);
     }
 
     private void makeHeapMesh(String marker) {
@@ -80,7 +67,6 @@ public class TeamService {
         db.add(rand.nextInt());
     }
 
-    // PresidentsExecutor
 
     @AllArgsConstructor
     class MyObject {

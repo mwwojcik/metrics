@@ -37,7 +37,6 @@ public class TeamController {
         return res;
     }
 
-
     @GetMapping("/{code}/captain")
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode)
@@ -49,11 +48,5 @@ public class TeamController {
 
     }
 
-    @GetMapping("/{code}/president")
-    @ResponseStatus(HttpStatus.OK)
-    public TeamPresidentDTO president(@PathVariable(name = "code") String teamCode){
-        var res = service.president(TeamCode.valueOf(teamCode));
-        log.info("GET on /team/president received!");
-        return res;
-    }
+
 }

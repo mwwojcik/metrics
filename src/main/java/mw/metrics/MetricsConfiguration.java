@@ -53,45 +53,12 @@ public class MetricsConfiguration {
         return WebClient.builder().clientConnector(new ReactorClientHttpConnector()).build();
     }
 
-    @Bean("DetailsExecutor")
-    public Executor detailsExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
-        executor.setKeepAliveSeconds(10);
-        executor.setThreadNamePrefix("detailsExecutor-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        return executor;
-    }
 
-    @Bean("PlayersExecutor")
-    public Executor playersExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
-        executor.setKeepAliveSeconds(10);
-        executor.setThreadNamePrefix("playersExecutor-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        return executor;
-    }
-
-    @Bean("PresidentsExecutor")
-    public Executor presidentsExecutor() {
-        ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(10);
-        executor.setMaxPoolSize(20);
-        executor.setQueueCapacity(100);
-        executor.setKeepAliveSeconds(10);
-        executor.setThreadNamePrefix("presidentsExecutor-");
-        executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-        return executor;
-    }
 
     @Bean
-    public TeamService teamService(WebClient webClient, RestTemplate restTemplate) {
-        return new TeamService(webClient, restTemplate);
+    public TeamService teamService(SlowRespondingTeamDetailService detailService,
+                                   FastRespondingTeamPlayersService fastRespondingTeamPlayersService) {
+        return new TeamService(fastRespondingTeamPlayersService, detailService);
     }
 
     @Bean
