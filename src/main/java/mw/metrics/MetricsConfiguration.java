@@ -1,6 +1,7 @@
 package mw.metrics;
 
 import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executor;
@@ -47,18 +48,22 @@ public class MetricsConfiguration {
     }
 
     @Bean
+    public MeterRegistry meterRegistry() {
+        return new SimpleMeterRegistry();
+    }
+
+    @Bean
     public WebClient webClient() {
 /*        return WebClient.builder().clientConnector(new ReactorClientHttpConnector(HttpClient.newConnection().responseTimeout(
             Duration.ofSeconds(1)).compress(true))).build();*/
         return WebClient.builder().clientConnector(new ReactorClientHttpConnector()).build();
     }
 
-
-
     @Bean
     public TeamService teamService(SlowRespondingTeamDetailService detailService,
-                                   FastRespondingTeamPlayersService fastRespondingTeamPlayersService) {
-        return new TeamService(fastRespondingTeamPlayersService, detailService);
+                                   FastRespondingTeamPlayersService fastRespondingTeamPlayersService,
+                                   MeterRegistry meterRegistry) {
+        return new TeamService(fastRespondingTeamPlayersService, detailService,meterRegistry);
     }
 
     @Bean

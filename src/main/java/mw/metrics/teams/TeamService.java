@@ -1,6 +1,9 @@
 package mw.metrics.teams;
 
 import com.sun.management.UnixOperatingSystemMXBean;
+import io.micrometer.core.instrument.MeterRegistry;
+import io.micrometer.core.instrument.Tags;
+import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +36,17 @@ public class TeamService {
 
     private FastRespondingTeamPlayersService teamPlayersService;
     private SlowRespondingTeamDetailService teamDetailService;
+    private MeterRegistry meterRegistry;
 
-    public TeamService(FastRespondingTeamPlayersService teamPlayersService,SlowRespondingTeamDetailService teamDetailService) {
+    public TeamService(FastRespondingTeamPlayersService teamPlayersService,
+                       SlowRespondingTeamDetailService teamDetailService,
+                       MeterRegistry meterRegistry) {
         this.teamPlayersService = teamPlayersService;
         this.teamDetailService = teamDetailService;
+        this.meterRegistry = meterRegistry;
+
+        new ExecutorServiceMetrics(detailsServicePool, "detailsServicePool", Tags.of("pool","pool")).bindTo(meterRegistry);
+        new ExecutorServiceMetrics(playersServicePool, "playersServicePool", Tags.of("pool","pool")).bindTo(meterRegistry);
     }
 
     public CompletableFuture<TeamScoreDTO> score(TeamCode teamCode) {
