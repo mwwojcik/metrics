@@ -328,8 +328,7 @@
               "options": {
                 "mode": "exclude",
                 "names": [
-                  "Remaining tasks",
-                  "Queued tasks"
+                  "Completed tasks"
                 ],
                 "prefix": "All except:",
                 "readOnly": true
@@ -371,11 +370,340 @@
           "expr": "rate(executor_completed_tasks_total{application=\"$application\", instance=\"$instance\",name=\"detailsServicePool\"}[1m])",
           "hide": false,
           "interval": "",
-          "legendFormat": "Remaining tasks",
+          "legendFormat": "Completed tasks",
           "refId": "D"
         }
       ],
       "title": "Custom Thread Pool Metric - Details Service Thread Pool - Completed Tasks",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 7,
+        "x": 0,
+        "y": 8
+      },
+      "id": 169,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "executor_pool_size_threads{application=\"$application\", instance=\"$instance\",name=\"playersServicePool\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Pool size threads",
+          "refId": "A"
+        },
+        {
+          "exemplar": true,
+          "expr": "executor_pool_max_threads{application=\"$application\", instance=\"$instance\",name=\"playersServicePool\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Pool max threads",
+          "refId": "B"
+        },
+        {
+          "exemplar": true,
+          "expr": "executor_pool_core_threads{application=\"$application\", instance=\"$instance\",name=\"playersServicePool\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Core threads",
+          "refId": "C"
+        },
+        {
+          "exemplar": true,
+          "expr": "executor_active_threads{application=\"$application\", instance=\"$instance\",name=\"detailsServicePool\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Active threads",
+          "refId": "D"
+        }
+      ],
+      "title": "Players Service Thread Pool",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Remaining tasks",
+                  "Queued tasks"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 7,
+        "y": 8
+      },
+      "id": 170,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "executor_queue_remaining_tasks{application=\"$application\", instance=\"$instance\",name=\"playersServicePool\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Remaining tasks",
+          "refId": "D"
+        },
+        {
+          "exemplar": true,
+          "expr": "executor_queued_tasks{application=\"$application\", instance=\"$instance\",name=\"playersServicePool\"}",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Queued tasks",
+          "refId": "E"
+        }
+      ],
+      "title": "Players Service Thread Pool - Tasks",
+      "type": "timeseries"
+    },
+    {
+      "datasource": null,
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineInterpolation": "smooth",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "never",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "normal"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": [
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "Completed tasks"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 7,
+        "w": 8,
+        "x": 15,
+        "y": 8
+      },
+      "id": 171,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "tooltip": {
+          "mode": "single"
+        }
+      },
+      "targets": [
+        {
+          "exemplar": true,
+          "expr": "rate(executor_completed_tasks_total{application=\"$application\", instance=\"$instance\",name=\"playersServicePool\"}[1m])",
+          "hide": false,
+          "interval": "",
+          "legendFormat": "Completed tasks",
+          "refId": "D"
+        }
+      ],
+      "title": "Players Service Thread Pool - Completed Tasks",
       "type": "timeseries"
     },
     {
@@ -385,7 +713,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 15
       },
       "id": 140,
       "panels": [],
@@ -404,7 +732,7 @@
         "h": 8,
         "w": 12,
         "x": 0,
-        "y": 9
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 142,
@@ -509,7 +837,7 @@
         "h": 8,
         "w": 12,
         "x": 12,
-        "y": 9
+        "y": 16
       },
       "hiddenSeries": false,
       "id": 156,
@@ -608,7 +936,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 17
+        "y": 24
       },
       "id": 125,
       "panels": [],
@@ -657,7 +985,7 @@
         "h": 3,
         "w": 6,
         "x": 0,
-        "y": 18
+        "y": 25
       },
       "id": 63,
       "interval": null,
@@ -733,7 +1061,7 @@
         "h": 3,
         "w": 6,
         "x": 6,
-        "y": 18
+        "y": 25
       },
       "id": 92,
       "interval": null,
@@ -814,7 +1142,7 @@
         "h": 3,
         "w": 6,
         "x": 12,
-        "y": 18
+        "y": 25
       },
       "id": 65,
       "interval": null,
@@ -904,7 +1232,7 @@
         "h": 3,
         "w": 6,
         "x": 18,
-        "y": 18
+        "y": 25
       },
       "id": 75,
       "interval": null,
@@ -946,7 +1274,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 28
       },
       "id": 126,
       "panels": [],
@@ -966,7 +1294,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 22
+        "y": 29
       },
       "hiddenSeries": false,
       "id": 111,
@@ -1062,7 +1390,7 @@
         "h": 7,
         "w": 6,
         "x": 6,
-        "y": 22
+        "y": 29
       },
       "hiddenSeries": false,
       "id": 112,
@@ -1154,7 +1482,7 @@
         "h": 7,
         "w": 6,
         "x": 12,
-        "y": 22
+        "y": 29
       },
       "hiddenSeries": false,
       "id": 113,
@@ -1255,7 +1583,7 @@
         "h": 7,
         "w": 6,
         "x": 18,
-        "y": 22
+        "y": 29
       },
       "hiddenSeries": false,
       "id": 119,
@@ -1383,7 +1711,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 36
       },
       "id": 127,
       "panels": [],
@@ -1413,7 +1741,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 30
+        "y": 37
       },
       "hiddenSeries": false,
       "id": 24,
@@ -1539,7 +1867,7 @@
         "h": 7,
         "w": 6,
         "x": 6,
-        "y": 30
+        "y": 37
       },
       "hiddenSeries": false,
       "id": 25,
@@ -1666,7 +1994,7 @@
         "h": 7,
         "w": 6,
         "x": 12,
-        "y": 30
+        "y": 37
       },
       "hiddenSeries": false,
       "id": 26,
@@ -1793,7 +2121,7 @@
         "h": 7,
         "w": 6,
         "x": 18,
-        "y": 30
+        "y": 37
       },
       "hiddenSeries": false,
       "id": 86,
@@ -1910,7 +2238,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 44
       },
       "id": 128,
       "panels": [],
@@ -1940,7 +2268,7 @@
         "h": 7,
         "w": 6,
         "x": 0,
-        "y": 38
+        "y": 45
       },
       "hiddenSeries": false,
       "id": 106,
@@ -2068,7 +2396,7 @@
         "h": 7,
         "w": 6,
         "x": 6,
-        "y": 38
+        "y": 45
       },
       "hiddenSeries": false,
       "id": 93,
@@ -2186,7 +2514,7 @@
         "h": 7,
         "w": 6,
         "x": 12,
-        "y": 38
+        "y": 45
       },
       "hiddenSeries": false,
       "id": 32,
@@ -2320,7 +2648,7 @@
         "h": 7,
         "w": 6,
         "x": 18,
-        "y": 38
+        "y": 45
       },
       "hiddenSeries": false,
       "id": 124,
@@ -2429,7 +2757,7 @@
         "h": 7,
         "w": 18,
         "x": 0,
-        "y": 45
+        "y": 52
       },
       "height": "",
       "hiddenSeries": false,
@@ -2555,7 +2883,7 @@
         "h": 7,
         "w": 6,
         "x": 18,
-        "y": 45
+        "y": 52
       },
       "hiddenSeries": false,
       "id": 61,
@@ -2662,7 +2990,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 52
+        "y": 59
       },
       "id": 129,
       "panels": [],
@@ -2692,7 +3020,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 53
+        "y": 60
       },
       "hiddenSeries": false,
       "id": 3,
@@ -2815,7 +3143,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 60
+        "y": 67
       },
       "id": 130,
       "panels": [
@@ -2975,7 +3303,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 61
+        "y": 68
       },
       "id": 131,
       "panels": [],
@@ -2995,7 +3323,7 @@
         "h": 7,
         "w": 8,
         "x": 0,
-        "y": 62
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 98,
@@ -3087,7 +3415,7 @@
         "h": 7,
         "w": 8,
         "x": 8,
-        "y": 62
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 101,
@@ -3189,7 +3517,7 @@
         "h": 7,
         "w": 8,
         "x": 16,
-        "y": 62
+        "y": 69
       },
       "hiddenSeries": false,
       "id": 99,
@@ -3284,7 +3612,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 69
+        "y": 76
       },
       "id": 132,
       "panels": [
@@ -3535,7 +3863,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 70
+        "y": 77
       },
       "id": 133,
       "panels": [
