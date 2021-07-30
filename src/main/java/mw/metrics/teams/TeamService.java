@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamDetailsDTO;
+import mw.metrics.teams.model.TeamInfoDTO;
 import mw.metrics.teams.model.TeamPlayersDTO;
 import mw.metrics.teams.model.TeamScoreDTO;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -40,6 +41,15 @@ public class TeamService {
         db.add(new MyObject("Captain", rand.nextInt()));
         db.add(rand.nextInt());
         return TeamCaptainDTO.from(teamCode, result.getCaptain());
+    }
+
+    public TeamInfoDTO details(TeamCode teamCode) {
+        db.add(new MyObject("Details", rand.nextInt()));
+        db.add(rand.nextInt());
+        var result = teamDetailService.get(teamCode);
+        var players = teamPlayersService.get(teamCode);
+
+        return TeamInfoDTO.from(teamCode, players.getCaptain(), result.getCountry(), result.getPosition());
     }
 
     @AllArgsConstructor

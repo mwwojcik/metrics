@@ -3,6 +3,7 @@ package mw.metrics.teams;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
+import mw.metrics.teams.model.TeamInfoDTO;
 import mw.metrics.teams.model.TeamScoreDTO;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -37,6 +38,15 @@ public class TeamController {
     public ResponseEntity<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode) {
         var res = service.captain(TeamCode.valueOf(teamCode));
         log.info("GET on /team/captain received!");
+        return ResponseEntity.ok(res);
+
+    }
+
+    @GetMapping("/{code}/details")
+    @ResponseStatus(HttpStatus.OK)
+    public ResponseEntity<TeamInfoDTO> details(@PathVariable(name = "code") String teamCode) {
+        var res = service.details(TeamCode.valueOf(teamCode));
+        log.info("GET on /team/details received!");
         return ResponseEntity.ok(res);
 
     }
