@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamDetailsDTO;
+import mw.metrics.teams.model.TeamInfoDTO;
 import mw.metrics.teams.model.TeamPlayersDTO;
 import mw.metrics.teams.model.TeamPresidentDTO;
 import mw.metrics.teams.model.TeamScoreDTO;
@@ -29,11 +30,10 @@ import org.springframework.web.util.UriComponentsBuilder;
 @Slf4j
 public class TeamService {
 
-       private Random rand = new Random();
+    private Random rand = new Random();
     public static List<Object> db = new ArrayList<>(100000);
     private ExecutorService detailsServicePool = Executors.newFixedThreadPool(20);
     private ExecutorService playersServicePool = Executors.newFixedThreadPool(20);
-
     private FastRespondingTeamPlayersService teamPlayersService;
     private SlowRespondingTeamDetailService teamDetailService;
     private MeterRegistry meterRegistry;
@@ -45,8 +45,8 @@ public class TeamService {
         this.teamDetailService = teamDetailService;
         this.meterRegistry = meterRegistry;
 
-        new ExecutorServiceMetrics(detailsServicePool, "detailsServicePool", Tags.of("pool","pool")).bindTo(meterRegistry);
-        new ExecutorServiceMetrics(playersServicePool, "playersServicePool", Tags.of("pool","pool")).bindTo(meterRegistry);
+        new ExecutorServiceMetrics(detailsServicePool, "detailsServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
+        new ExecutorServiceMetrics(playersServicePool, "playersServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
     }
 
     public CompletableFuture<TeamScoreDTO> score(TeamCode teamCode) {
@@ -59,8 +59,16 @@ public class TeamService {
         return resultAsync.thenApply(it -> TeamCaptainDTO.from(teamCode, it.getCaptain()));
     }
 
+    public CompletableFuture<TeamInfoDTO> details(TeamCode teamCode) {
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode), detailsServicePool);
+        var playersAsync = CompletableFuture.supplyAsync(() -> loadTeamPlayer(teamCode), playersServicePool);
 
-
+        return resultAsync.thenCombine(playersAsync,
+                                       (details, players) -> TeamInfoDTO.from(details.getCode(),
+                                                                              players.getCaptain(),
+                                                                              details.getCountry(),
+                                                                              details.getPosition()));
+    }
 
     private TeamPlayersDTO loadTeamPlayer(TeamCode teamCode) {
         makeHeapMesh("Captain");
@@ -76,7 +84,6 @@ public class TeamService {
         db.add(new MyObject(marker, rand.nextInt()));
         db.add(rand.nextInt());
     }
-
 
     @AllArgsConstructor
     class MyObject {

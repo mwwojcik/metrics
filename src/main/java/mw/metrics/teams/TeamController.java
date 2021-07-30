@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutionException;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
+import mw.metrics.teams.model.TeamInfoDTO;
 import mw.metrics.teams.model.TeamPresidentDTO;
 import mw.metrics.teams.model.TeamScoreDTO;
 import org.springframework.http.HttpStatus;
@@ -44,6 +45,16 @@ public class TeamController {
         var res = service.captain(TeamCode.valueOf(teamCode));
         log.info("GET on /team/captain received!");
         var teamCaptainDTO = res.get();
+        return res;
+
+    }
+
+    @GetMapping("/{code}/details")
+    @ResponseStatus(HttpStatus.OK)
+    public CompletableFuture<TeamInfoDTO> details(@PathVariable(name = "code") String teamCode)
+        throws ExecutionException, InterruptedException {
+        var res = service.details(TeamCode.valueOf(teamCode));
+        log.info("GET on /team/details received!");
         return res;
 
     }
