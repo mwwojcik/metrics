@@ -30,29 +30,24 @@ public class TeamController {
 
     @GetMapping("/{code}/score")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode)
-        throws InterruptedException, ExecutionException {
+    public CompletableFuture<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode) {
         var res = service.score(TeamCode.valueOf(teamCode));
         log.info("GET on /team/score received!");
-        var teamScoreDTO = res.get();
         return res;
     }
 
     @GetMapping("/{code}/captain")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode)
-        throws ExecutionException, InterruptedException {
+    public CompletableFuture<TeamCaptainDTO> captain(@PathVariable(name = "code") String teamCode){
         var res = service.captain(TeamCode.valueOf(teamCode));
         log.info("GET on /team/captain received!");
-        var teamCaptainDTO = res.get();
         return res;
 
     }
 
     @GetMapping("/{code}/details")
     @ResponseStatus(HttpStatus.OK)
-    public CompletableFuture<TeamInfoDTO> details(@PathVariable(name = "code") String teamCode)
-        throws ExecutionException, InterruptedException {
+    public CompletableFuture<TeamInfoDTO> details(@PathVariable(name = "code") String teamCode) {
         var res = service.details(TeamCode.valueOf(teamCode));
         log.info("GET on /team/details received!");
         return res;

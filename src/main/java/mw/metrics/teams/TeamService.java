@@ -34,16 +34,16 @@ public class TeamService {
     public static List<Object> db = new ArrayList<>(100000);
     private ExecutorService detailsServicePool = Executors.newFixedThreadPool(20);
     private ExecutorService playersServicePool = Executors.newFixedThreadPool(20);
+
     private FastRespondingTeamPlayersService teamPlayersService;
     private SlowRespondingTeamDetailService teamDetailService;
-    private MeterRegistry meterRegistry;
+
 
     public TeamService(FastRespondingTeamPlayersService teamPlayersService,
                        SlowRespondingTeamDetailService teamDetailService,
                        MeterRegistry meterRegistry) {
         this.teamPlayersService = teamPlayersService;
         this.teamDetailService = teamDetailService;
-        this.meterRegistry = meterRegistry;
 
         new ExecutorServiceMetrics(detailsServicePool, "detailsServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
         new ExecutorServiceMetrics(playersServicePool, "playersServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
