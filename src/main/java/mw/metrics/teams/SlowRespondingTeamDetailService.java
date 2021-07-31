@@ -18,7 +18,7 @@ public class SlowRespondingTeamDetailService {
 
     public TeamDetailsDTO get(TeamCode key) {
 
-        Sleeper.sleepMillis(250);
+        Sleeper.sleepMillis(500);
         return db.get(key);
     }
 }
