@@ -29,7 +29,7 @@ import org.springframework.web.reactive.function.client.WebClient;
 @EnableAsync
 public class MetricsConfiguration {
 
-    @PostConstruct
+   // @PostConstruct
     public void init() {
         for (int i = 0; i < 1000; i++) {
             (new MyThread()).start();
