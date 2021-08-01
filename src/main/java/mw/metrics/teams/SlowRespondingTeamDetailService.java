@@ -1,10 +1,13 @@
 package mw.metrics.teams;
 
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 import mw.metrics.Sleeper;
 import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamDetailsDTO;
 
+@Slf4j
 public class SlowRespondingTeamDetailService {
 
     private Map<TeamCode, TeamDetailsDTO> db = Map.of(TeamCode.PL,
@@ -16,9 +19,14 @@ public class SlowRespondingTeamDetailService {
                                                       TeamCode.ESP,
                                                       TeamDetailsDTO.from(TeamCode.PL, "Spain", 4));
 
-    public TeamDetailsDTO get(TeamCode key) {
+    public TeamDetailsDTO get(TeamCode key,String parentThreadName) {
 
-        Sleeper.sleepMillis(500);
-        return db.get(key);
+        try {
+            TimeUnit.MILLISECONDS.sleep(500);
+            log.info("= Run with thread => "+Thread.currentThread().getName() + " parent-thread=> "+ parentThreadName);
+        } catch (InterruptedException e) {
+            throw new IllegalStateException(e);
+        }
+        return TeamDetailsDTO.from(TeamCode.PL, "Poland", 30);
     }
 }

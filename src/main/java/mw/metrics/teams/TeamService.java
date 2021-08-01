@@ -1,16 +1,19 @@
 package mw.metrics.teams;
 
-import com.sun.management.UnixOperatingSystemMXBean;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
-import java.lang.management.ManagementFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicInteger;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
@@ -18,26 +21,22 @@ import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamDetailsDTO;
 import mw.metrics.teams.model.TeamInfoDTO;
 import mw.metrics.teams.model.TeamPlayersDTO;
-import mw.metrics.teams.model.TeamPresidentDTO;
 import mw.metrics.teams.model.TeamScoreDTO;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.web.reactive.function.client.WebClient;
-import org.springframework.web.util.UriComponentsBuilder;
 
 @Slf4j
 public class TeamService {
 
     private Random rand = new Random();
     public static List<Object> db = new ArrayList<>(100000);
-    private ExecutorService detailsServicePool = Executors.newFixedThreadPool(20);
-    private ExecutorService playersServicePool = Executors.newFixedThreadPool(20);
-
+    private ExecutorService detailsServicePool = new ThreadPoolExecutor(100,
+                                                                        100,
+                                                                        0L,
+                                                                        TimeUnit.MILLISECONDS,
+                                                                        new LinkedBlockingQueue<Runnable>(),
+                                                                        MyThreadFactory.create());
+    private ExecutorService playersServicePool = Executors.newFixedThreadPool(100);
     private FastRespondingTeamPlayersService teamPlayersService;
     private SlowRespondingTeamDetailService teamDetailService;
-
 
     public TeamService(FastRespondingTeamPlayersService teamPlayersService,
                        SlowRespondingTeamDetailService teamDetailService,
@@ -50,7 +49,10 @@ public class TeamService {
     }
 
     public CompletableFuture<TeamScoreDTO> score(TeamCode teamCode) {
-        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode), detailsServicePool);
+
+        var parentName = Thread.currentThread().getName();
+
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode, parentName), detailsServicePool);
         return resultAsync.thenApply(it -> TeamScoreDTO.from(teamCode, it.getPosition()));
     }
 
@@ -60,7 +62,8 @@ public class TeamService {
     }
 
     public CompletableFuture<TeamInfoDTO> details(TeamCode teamCode) {
-        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode), detailsServicePool);
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode, Thread.currentThread().getName()),
+                                                        detailsServicePool);
         var playersAsync = CompletableFuture.supplyAsync(() -> loadTeamPlayer(teamCode), playersServicePool);
 
         return resultAsync.thenCombine(playersAsync,
@@ -75,9 +78,9 @@ public class TeamService {
         return teamPlayersService.get(teamCode);
     }
 
-    private TeamDetailsDTO loadTeamDetails(TeamCode teamCode) {
+    private TeamDetailsDTO loadTeamDetails(TeamCode teamCode, String parentThreadName) {
         makeHeapMesh("Score");
-        return teamDetailService.get(teamCode);
+        return teamDetailService.get(teamCode, parentThreadName);
     }
 
     private void makeHeapMesh(String marker) {
@@ -91,4 +94,20 @@ public class TeamService {
         String name;
         Integer account;
     }
+}
+
+class MyThreadFactory implements ThreadFactory {
+
+    private int ordinal = 1;
+
+    @Override
+    public Thread newThread(Runnable r) {
+        return new Thread(r, "CustomThread-" + ordinal++);
+    }
+
+    public static MyThreadFactory create() {
+        return new MyThreadFactory();
+    }
+
+
 }

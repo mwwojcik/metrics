@@ -31,8 +31,9 @@ public class TeamController {
     @GetMapping("/{code}/score")
     @ResponseStatus(HttpStatus.OK)
     public CompletableFuture<TeamScoreDTO> score(@PathVariable(name = "code") String teamCode) {
-        var res = service.score(TeamCode.valueOf(teamCode));
         log.info("GET on /team/score received!");
+        var res = service.score(TeamCode.valueOf(teamCode));
+        log.info("GET on /team/score returned!");
         return res;
     }
 
