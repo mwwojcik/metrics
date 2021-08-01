@@ -5,6 +5,7 @@ import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Random;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -14,6 +15,7 @@ import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import mw.metrics.teams.model.TeamCaptainDTO;
@@ -52,8 +54,10 @@ public class TeamService {
 
         var parentName = Thread.currentThread().getName();
 
-        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode, parentName), detailsServicePool);
-        return resultAsync.thenApply(it -> TeamScoreDTO.from(teamCode, it.getPosition()));
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode, parentName), detailsServicePool)
+                                           .whenComplete(handleAsyncException());
+
+        return resultAsync.whenComplete(handleAsyncException()).thenApply(it -> TeamScoreDTO.from(teamCode, it.getPosition()));
     }
 
     public CompletableFuture<TeamCaptainDTO> captain(TeamCode teamCode) {
@@ -81,6 +85,15 @@ public class TeamService {
     private TeamDetailsDTO loadTeamDetails(TeamCode teamCode, String parentThreadName) {
         makeHeapMesh("Score");
         return teamDetailService.get(teamCode, parentThreadName);
+    }
+
+    private BiConsumer<TeamDetailsDTO, Throwable> handleAsyncException() {
+        return (msg, ex) -> {
+            if (Objects.nonNull(ex)) {
+                log.info("!!!!!!!!!!! Exception occured =>" + ex.getMessage());
+            }
+
+        };
     }
 
     private void makeHeapMesh(String marker) {
