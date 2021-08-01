@@ -3,6 +3,7 @@ package mw.metrics.teams;
 import io.micrometer.core.instrument.MeterRegistry;
 import io.micrometer.core.instrument.Tags;
 import io.micrometer.core.instrument.binder.jvm.ExecutorServiceMetrics;
+import io.micrometer.core.instrument.internal.TimedExecutorService;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -18,6 +19,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import mw.metrics.base.MyTimedExecutorService;
 import mw.metrics.teams.model.TeamCaptainDTO;
 import mw.metrics.teams.model.TeamCode;
 import mw.metrics.teams.model.TeamDetailsDTO;
@@ -30,12 +32,7 @@ public class TeamService {
 
     private Random rand = new Random();
     public static List<Object> db = new ArrayList<>(100000);
-    private ExecutorService detailsServicePool = new ThreadPoolExecutor(100,
-                                                                        100,
-                                                                        0L,
-                                                                        TimeUnit.MILLISECONDS,
-                                                                        new LinkedBlockingQueue<Runnable>(),
-                                                                        MyThreadFactory.create());
+    private ExecutorService detailsServicePool = null;
     private ExecutorService playersServicePool = Executors.newFixedThreadPool(100);
     private FastRespondingTeamPlayersService teamPlayersService;
     private SlowRespondingTeamDetailService teamDetailService;
@@ -46,15 +43,27 @@ public class TeamService {
         this.teamPlayersService = teamPlayersService;
         this.teamDetailService = teamDetailService;
 
-        new ExecutorServiceMetrics(detailsServicePool, "detailsServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
+        var internalPool=new ThreadPoolExecutor(100,
+                                                100,
+                                                0L,
+                                                TimeUnit.MILLISECONDS,
+                                                new LinkedBlockingQueue<Runnable>(2000),
+                                                MyThreadFactory.create());
+
+        detailsServicePool=new MyTimedExecutorService(meterRegistry, internalPool, "detailsServicePool", "detailsServicePool",
+                                                      Tags.of("pool", "pool"));
+
+        new ExecutorServiceMetrics(internalPool, "detailsServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
         new ExecutorServiceMetrics(playersServicePool, "playersServicePool", Tags.of("pool", "pool")).bindTo(meterRegistry);
+
+
     }
 
     public CompletableFuture<TeamScoreDTO> score(TeamCode teamCode) {
 
         var parentName = Thread.currentThread().getName();
 
-        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode, parentName), detailsServicePool)
+        var resultAsync = CompletableFuture.supplyAsync(() -> loadTeamDetails(teamCode, parentName),detailsServicePool)
                                            .whenComplete(handleAsyncException());
 
         return resultAsync.whenComplete(handleAsyncException()).thenApply(it -> TeamScoreDTO.from(teamCode, it.getPosition()));
